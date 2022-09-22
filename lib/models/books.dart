@@ -1,14 +1,16 @@
+import 'package:firebase_1/database/img_urls.dart';
+
 class Books {
   late String category;
   late int numberOfBooks;
   late bool isActive;
-  late List<String> nameOfBooks;
   late Map<String, String> bookNameWithAuthor;
-  late List<double?> price;
+  late List<String> listOfImgUrls;
 
   Books.all()
       : category = 'All',
         isActive = false,
+        listOfImgUrls = allImgLinks,
         //<NameOfBook, Author>
         bookNameWithAuthor = {
           'Think And grow rich': 'Napolean Hill',
@@ -43,6 +45,7 @@ class Books {
           'How To Stop Worrying And Start Living': 'Dale Carnegie',
           'Daring Greatly': 'Brene Brown',
           'Big Magic': 'Elizabeth Gilbert',
+          'The Autobiography of a Yogi': 'Yogananda Paramahansa'
         } {
     numberOfBooks = bookNameWithAuthor.length;
   }
@@ -50,6 +53,7 @@ class Books {
   Books.biography()
       : category = 'Biography',
         isActive = false,
+        listOfImgUrls = biographyImgLinks,
         bookNameWithAuthor = {
           'Steve Jobs': 'Walter Isaacson',
           'A Beautiful Mind': 'Sylvia Nasar',
@@ -83,10 +87,11 @@ class Books {
   Books.fiction()
       : category = 'Fiction',
         isActive = false,
+        listOfImgUrls = fictionImgLinks,
         bookNameWithAuthor = {
           'The Maid': 'Nita Prose',
           'Olga Dies Dreaming': 'Xochitl Gonzalez',
-          'The Harry Potter series': 'J.K.Rowling',
+          'The Harry Potter And the Philosopheres stone': 'J.K.Rowling',
           "The Lord of the Rings Trilogy": 'J.R.R. Tolkien',
           'The Count of Monte Cristo': 'Alexandre Dumas',
           'To Kill a Mockingbird': 'Harper Lee',
@@ -101,8 +106,8 @@ class Books {
 
   Books.nonFiction()
       : category = 'Non Fiction',
-        numberOfBooks = 8,
         isActive = false,
+        listOfImgUrls = nonFictionImgLinks,
         bookNameWithAuthor = {
           'Shoe-dog ': 'Phil knight',
           'We Should All Be Feminists': 'Chimamanda Ngozi Adichie',
@@ -123,8 +128,8 @@ class Books {
 
   Books.novel()
       : category = 'Novel',
-        numberOfBooks = 8,
         isActive = false,
+        listOfImgUrls = novelsImgLinks,
         bookNameWithAuthor = {
           'ULYSSES': 'James Joyce',
           'THE GREAT GATSBY': 'F. Scott Fitzgerald',
@@ -153,6 +158,7 @@ class Books {
   Books.selfHelp()
       : category = 'Self Help',
         isActive = false,
+        listOfImgUrls = selfHelpImgLinks,
         bookNameWithAuthor = {
           'Think And grow rich': 'Napolean Hill',
           'Rich Dad Poor Dad': 'Robert Kiyosaki',
@@ -173,19 +179,9 @@ class Books {
           'Big Magic': 'Elizabeth Gilbert',
           'Quiet': 'Susan Cain',
           'The Magic Of Thinking Big': 'David Joseph Schwartz',
-          'The 5 Love Languages': 'Gary Chapman'
+          'The 5 Love Languages': 'Gary Chapman',
+          'The Autobiography of a Yogi': 'Yogananda Paramahansa'
         } {
     numberOfBooks = bookNameWithAuthor.length;
   }
-}
-
-class Book {
-  final String bookName;
-  final String bookAuthor;
-  final int bookPrice;
-
-  Book.all()
-      : bookName = 'How to Win Friends And Influence People',
-        bookAuthor = "Dale Carnegie",
-        bookPrice = 150;
 }
