@@ -370,12 +370,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
 class Utilis {
   static final messengerKey = GlobalKey<ScaffoldMessengerState>();
-  static showSnackBar(errorMsg) {
+  static showSnackBar(errorMsg, {Color color = const Color(0xFFEF9A9A)}) {
     if (errorMsg == null) return null;
 
     final snackBar = SnackBar(
       content: Text(errorMsg),
-      backgroundColor: Colors.red[200],
+      backgroundColor: color,
     );
 
     messengerKey.currentState!

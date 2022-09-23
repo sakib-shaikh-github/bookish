@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:firebase_1/Themeing/themeing.dart';
 import 'package:firebase_1/authenticate/authenticating.dart';
 import 'package:firebase_1/firebase_options.dart';
+import 'package:firebase_1/screens/book/book_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +31,7 @@ class App extends StatelessWidget {
       title: 'Flutter Meetup',
       theme: themeing(),
       home: const MainPage(),
+      scrollBehavior: const ConstantScrollBehavior(),
     );
   }
 }
@@ -57,4 +59,25 @@ class _MainPageState extends State<MainPage> {
               }
             })));
   }
+}
+
+class ConstantScrollBehavior extends ScrollBehavior {
+  const ConstantScrollBehavior();
+
+  @override
+  Widget buildScrollbar(
+          BuildContext context, Widget child, ScrollableDetails details) =>
+      child;
+
+  @override
+  Widget buildOverscrollIndicator(
+          BuildContext context, Widget child, ScrollableDetails details) =>
+      child;
+
+  @override
+  TargetPlatform getPlatform(BuildContext context) => TargetPlatform.macOS;
+
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) =>
+      const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics());
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_1/screens/Home/Utilis/category_pressed.dart';
+import 'package:firebase_1/screens/book/book_screen.dart';
 import 'package:firebase_1/services/getting_imgs.dart';
 import 'package:firebase_1/services/price_assign.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -78,93 +79,88 @@ class _HomeScreenState extends State<HomeScreen> {
     Books categoryToBeDisplayed = Books.all();
 
     return SingleChildScrollView(
-      child: Flexible(
-        child: Padding(
-          padding: const EdgeInsets.only(left: 5),
-          child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                //1
-                headLine(context),
-                //2 This will deal with whole book categories section
-                const SizedBox(
-                  height: 15,
-                ),
-                //3
-                StreamBuilder<Object>(
-                    stream: controller.stream,
-                    builder: (context, snapshot) {
-                      return Flexible(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            //1 To show categories
-                            SizedBox(
-                              height: 35,
-                              child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: bookObjs.length,
-                                  itemBuilder: (context, index) {
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8),
-                                      child: OutlinedButton(
-                                          onPressed: () {
-                                            //Here simplifying things
-                                            changingButtonColor(
-                                                bookObjs, index);
+      child: Padding(
+        padding: const EdgeInsets.only(left: 5),
+        child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              //1
+              headLine(context),
+              //2 This will deal with whole book categories section
+              const SizedBox(
+                height: 15,
+              ),
+              //3
+              StreamBuilder<Object>(
+                  stream: controller.stream,
+                  builder: (context, snapshot) {
+                    return Flexible(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          //1 To show categories
+                          SizedBox(
+                            height: 35,
+                            child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: bookObjs.length,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8),
+                                    child: OutlinedButton(
+                                        onPressed: () {
+                                          //Here simplifying things
+                                          changingButtonColor(bookObjs, index);
 
-                                            categoryToBeDisplayed =
-                                                displayCategory(bookObjs,
-                                                    categoryToBeDisplayed);
+                                          categoryToBeDisplayed =
+                                              displayCategory(bookObjs,
+                                                  categoryToBeDisplayed);
 
-                                            controller.add(Object());
-                                          },
-                                          style: bookObjs[index].isActive
-                                              ? ButtonStyle(
-                                                  backgroundColor:
-                                                      MaterialStateProperty.all(
-                                                          const Color(
-                                                              0xFFD1C4E9)),
-                                                )
-                                              : null,
-                                          child:
-                                              Text(bookObjs[index].category)),
-                                    );
-                                  }),
-                            ),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            //2 To display book section
-                            SizedBox(
-                              height: 230,
-                              child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount:
-                                      categoryToBeDisplayed.numberOfBooks,
-                                  itemBuilder: ((context, index) =>
-                                      categoryBuilder(
-                                          categoryToBeDisplayed, index))),
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
+                                          controller.add(Object());
+                                        },
+                                        style: bookObjs[index].isActive
+                                            ? ButtonStyle(
+                                                backgroundColor:
+                                                    MaterialStateProperty.all(
+                                                        const Color(
+                                                            0xFFD1C4E9)),
+                                              )
+                                            : null,
+                                        child: Text(bookObjs[index].category)),
+                                  );
+                                }),
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          //2 To display book section
+                          SizedBox(
+                            height: 230,
+                            child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: categoryToBeDisplayed.numberOfBooks,
+                                itemBuilder: ((context, index) =>
+                                    categoryBuilder(
+                                        categoryToBeDisplayed, index))),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
 
-                // 4
-                nonFictionCategoryBuilder(),
-                // 5
-                selfHelpCategoryBuilder(),
-                //6
-                fictionCategoryBuilder(),
-                //7
-                novelCategoryBuilder(),
-                //8
-                biographyCategoryBuilder()
-              ]),
-        ),
+              // 4
+              nonFictionCategoryBuilder(),
+              // 5
+              selfHelpCategoryBuilder(),
+              //6
+              fictionCategoryBuilder(),
+              //7
+              novelCategoryBuilder(),
+              //8
+              biographyCategoryBuilder()
+            ]),
       ),
     );
   }
@@ -174,62 +170,69 @@ class _HomeScreenState extends State<HomeScreen> {
         width: 155,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Stack(
-            clipBehavior: Clip.hardEdge,
-            children: [
-              Positioned(
-                top: 15,
-                child: Container(
-                  height: 200,
-                  width: 140,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: Colors.grey[200],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Wrap(
-                      spacing: 5,
-                      alignment: WrapAlignment.end,
-                      direction: Axis.vertical,
-                      children: [
-                        Text(
-                          categoryToBeDisplayed.bookNameWithAuthor.keys
-                              .elementAt(index),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          categoryToBeDisplayed.bookNameWithAuthor.values
-                              .elementAt(index),
-                        ),
-                        Text(
-                          'Rs.${assigningPricesWRTCategory(categoryToBeDisplayed)[index]}',
-                          style: const TextStyle(
-                              color: Color(0xFF8D7DAC),
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ],
+          child: InkWell(
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: ((context) => Book(
+                    categoryToBeDisplayed: categoryToBeDisplayed,
+                    index: index)))),
+            splashColor: const Color(0xFFD1C4E9),
+            child: Stack(
+              clipBehavior: Clip.hardEdge,
+              children: [
+                Positioned(
+                  top: 15,
+                  child: Container(
+                    height: 200,
+                    width: 140,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Colors.grey[200],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Wrap(
+                        spacing: 5,
+                        alignment: WrapAlignment.end,
+                        direction: Axis.vertical,
+                        children: [
+                          Text(
+                            categoryToBeDisplayed.bookNameWithAuthor.keys
+                                .elementAt(index),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            categoryToBeDisplayed.bookNameWithAuthor.values
+                                .elementAt(index),
+                          ),
+                          Text(
+                            'Rs.${assigningPricesWRTCategory(categoryToBeDisplayed)[index]}',
+                            style: const TextStyle(
+                                color: Color(0xFF8D7DAC),
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Positioned(
-                  top: -5,
-                  right: 20,
-                  child: Container(
-                      height: 140,
-                      width: 90,
-                      decoration: const BoxDecoration(
-                          color: Color.fromARGB(138, 255, 254, 254),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Color.fromARGB(231, 80, 79, 79),
-                                offset: Offset(-4, 4),
-                                blurRadius: 4)
-                          ]),
-                      child: displayImage(
-                          context, categoryToBeDisplayed.listOfImgUrls[index])))
-            ],
+                Positioned(
+                    top: -5,
+                    right: 20,
+                    child: Container(
+                        height: 140,
+                        width: 90,
+                        decoration: const BoxDecoration(
+                            color: Color.fromARGB(138, 255, 254, 254),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Color.fromARGB(231, 80, 79, 79),
+                                  offset: Offset(-4, 4),
+                                  blurRadius: 4)
+                            ]),
+                        child: displayImage(context,
+                            categoryToBeDisplayed.listOfImgUrls[index])))
+              ],
+            ),
           ),
         ),
       );
