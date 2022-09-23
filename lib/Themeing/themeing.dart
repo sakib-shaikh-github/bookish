@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-ThemeData themeing() {
-  return ThemeData(
+class MyThemes {
+  static final lightTheme = ThemeData(
       primaryColor: const Color.fromARGB(255, 209, 196, 233),
       colorScheme: const ColorScheme.light(
           primary: Color.fromARGB(255, 209, 196, 233),

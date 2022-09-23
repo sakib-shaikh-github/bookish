@@ -41,6 +41,14 @@ dependencies:
   cloud_firestore: ^3.4.7
   email_validator: ^2.1.17
   firebase_storage: ^10.3.8
+  flutter_native_splash: ^2.2.9
+
+
+flutter_native_splash:
+  color: '#ffffff'
+  image: 'assets/splash.png'
+  android: true
+  ios: true
 
 dev_dependencies:
   flutter_test:

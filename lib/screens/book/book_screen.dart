@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_1/authenticate/authenticating.dart';
+import 'package:firebase_1/database/descriptions.dart';
 import 'package:firebase_1/models/books.dart';
+import 'package:firebase_1/screens/Home/model/categories_builder.dart';
 import 'package:firebase_1/services/price_assign.dart';
 import 'package:flutter/material.dart';
 
@@ -53,55 +56,151 @@ class _BookState extends State<Book> {
     );
   }
 
-  sliverMainPage() => SliverList(
-        delegate: SliverChildBuilderDelegate(((context, index) {
-          return Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  //1
-                  Text(
-                      widget.categoryToBeDisplayed.bookNameWithAuthor.keys
-                          .elementAt(widget.index),
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 25)),
-                  //2
-                  Text(
-                      widget.categoryToBeDisplayed.bookNameWithAuthor.values
-                          .elementAt(widget.index),
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w500, fontSize: 15)),
+  sliverMainPage() {
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(((context, index) {
+        return Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(
+                  height: 5,
+                ),
+                //1
+                Text(
+                    widget.categoryToBeDisplayed.bookNameWithAuthor.keys
+                        .elementAt(widget.index),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 25)),
+                //2
+                Text(
+                    widget.categoryToBeDisplayed.bookNameWithAuthor.values
+                        .elementAt(widget.index),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w500, fontSize: 15)),
 
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  //3
-                  Text(
-                      'Rs.${assigningPricesWRTCategory(widget.categoryToBeDisplayed)[widget.index]}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        color: Color(0xFF8D7DAC),
-                      )),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                const SizedBox(
+                  height: 10,
+                ),
+                //3
+                Text(
+                    'Rs.${assigningPricesWRTCategory(widget.categoryToBeDisplayed)[widget.index]}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Color(0xFF8D7DAC),
+                    )),
+                const SizedBox(
+                  height: 10,
+                ),
 
-                  //4
-                  ShoppingTab(
-                      price: assigningPricesWRTCategory(
-                          widget.categoryToBeDisplayed)[widget.index]),
+                //4
+                ShoppingTab(
+                    price: assigningPricesWRTCategory(
+                        widget.categoryToBeDisplayed)[widget.index]),
 
-                  //5
-                  const Text('Description')
-                ],
-              ));
-        }), childCount: 1),
-      );
+                //5
+                BuildingDescription(categoryToBeDisplayed: widget.categoryToBeDisplayed,index: widget.index,),
+
+                //6
+                aboutQuality(),
+
+                //7
+                BuildingMore(
+                  categoryToBeDisplayed: widget.categoryToBeDisplayed,
+                )
+              ],
+            ));
+      }), childCount: 1),
+    );
+  }
+}
+
+ValueNotifier<int> totalPrice = ValueNotifier(0); //Global
+
+class BuildingDescription extends StatefulWidget {
+  const BuildingDescription({
+    super.key,
+    required this.categoryToBeDisplayed,
+    required this.index
+  });
+
+  final int index;
+  final Books categoryToBeDisplayed;
+
+  @override
+  State<BuildingDescription> createState() => _BuildingDescriptionState();
+}
+
+class _BuildingDescriptionState extends State<BuildingDescription> {
+
+  String formattedDescription = '';
+  bool toShowMore = false;
+  @override
+  Widget build(BuildContext context) {
+    String description = widget.categoryToBeDisplayed.listOfDescriptions[widget.index];
+    return Wrap(
+      runSpacing: 10,
+      children: [
+        const Divider(
+          thickness: 1,
+          height: 20,
+          indent: 40,
+          endIndent: 50,
+        ),
+        const Text(
+          'Description',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+        ),
+        Column(
+          children: [
+            Text(formattingDescription(description)),
+            description.length > 500
+                ? !toShowMore
+                    ? moreButton()
+                    : lessButton()
+                : const Text('')
+          ],
+        ),
+      ],
+    );
+  }
+
+  String formattingDescription(String description) {
+    if (description.length > 500 && !toShowMore) {
+      return formattedDescription = 
+          " ${description.replaceRange(500, description.length, '')}";
+    } else {
+      return formattedDescription = " $description";
+    }
+  }
+
+  moreButton() {
+    return TextButton(
+        onPressed: () {
+          setState(() {
+            toShowMore = true;
+          });
+        },
+        child: const Text(
+          'more',
+          style: TextStyle(color: Colors.blue),
+        ));
+  }
+
+  lessButton() {
+    return TextButton(
+        onPressed: () {
+          setState(() {
+            toShowMore = false;
+          });
+        },
+        child: const Text(
+          'less',
+          style: TextStyle(color: Colors.blue),
+        ));
+  }
 }
 
 class ShoppingTab extends StatefulWidget {
@@ -114,7 +213,6 @@ class ShoppingTab extends StatefulWidget {
 
 class _ShoppingTabState extends State<ShoppingTab> {
   int quantity = 0;
-  var totalPrice = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -134,23 +232,18 @@ class _ShoppingTabState extends State<ShoppingTab> {
                   width: 40,
                   child: TextButton(
                       onPressed: () => setState(() {
-                            if (0 <= quantity && quantity < 10) {
-                              quantity += 1;
-                              totalPrice += widget.price;
+                            if (1 <= quantity && quantity <= 10) {
+                              quantity -= 1;
+                              totalPrice.value -= widget.price;
                             } else {
                               quantity;
-                              Utilis.showSnackBar('No more than 10. Sorry😕',
-                                  color: const Color.fromARGB(255, 252, 193, 104));
                             }
                           }),
-                      child: Row(
-                        children: const [
-                          Icon(
-                            Icons.add,
-                            color: Color(0xFF000000),
-                          ),
-                        ],
+                      child: const Icon(
+                        Icons.remove,
+                        color: Color(0xFF000000),
                       ))),
+
               //2
               Container(
                 height: 30,
@@ -164,29 +257,33 @@ class _ShoppingTabState extends State<ShoppingTab> {
               ),
               //3
               SizedBox(
-                  width: 30,
+                  width: 40,
                   child: TextButton(
                       onPressed: () => setState(() {
-                            if (1 <= quantity && quantity <= 10) {
-                              quantity -= 1;
-                              totalPrice -= widget.price;
+                            if (0 <= quantity && quantity < 10) {
+                              quantity += 1;
+                              totalPrice.value += widget.price;
                             } else {
                               quantity;
-                              Utilis.showSnackBar('Only errors can be given less then 0 here. Sorry😂',
-                                  color: const Color.fromARGB(255, 252, 193, 104));
+                              Utilis.showSnackBar('No more than 10. Sorry😕',
+                                  color:
+                                      const Color.fromARGB(255, 252, 193, 104));
                             }
                           }),
-                      child: const Icon(
-                        Icons.remove,
-                        color: Color(0xFF000000),
+                      child: Row(
+                        children: const [
+                          Icon(
+                            Icons.add,
+                            color: Color(0xFF000000),
+                          ),
+                        ],
                       ))),
-              const SizedBox(
-                width: 120,
-              ),
               //4
-
+              const SizedBox(
+                width: 140,
+              ),
               Text(
-                totalPrice.toString(),
+                totalPrice.value.toString(),
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
@@ -206,6 +303,132 @@ class _ShoppingTabState extends State<ShoppingTab> {
           ),
         ],
       ),
+    );
+  }
+}
+
+aboutQuality() {
+  const String quality =
+      "The book you'll get will of Original paper back as shown with a usefull bookmark attached in it, you can replace, exchange or give feedback about the product for your convenience. Thank You🤗";
+
+  return Wrap(
+    runSpacing: 10,
+    children: const [
+      Divider(
+        thickness: 1,
+        height: 20,
+        indent: 40,
+        endIndent: 50,
+      ),
+      Text(
+        'About Quality',
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+      ),
+      Text(quality)
+    ],
+  );
+}
+
+class DeliveringDetails extends StatefulWidget {
+  const DeliveringDetails({super.key});
+
+  @override
+  State<DeliveringDetails> createState() => _DeliveringDetailsState();
+}
+
+class _DeliveringDetailsState extends State<DeliveringDetails> {
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+        valueListenable: totalPrice,
+        builder: ((context, value, child) => Wrap(
+              runSpacing: 10,
+              children: [
+                const Divider(
+                  thickness: 1,
+                  height: 20,
+                  indent: 40,
+                  endIndent: 50,
+                ),
+                const Text(
+                  'Delivering details',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Wrap(
+                    runSpacing: 6,
+                    children: [
+                      //1
+                      gettingTotalPrice(),
+                      //2
+                      deliveryCharges()
+                    ],
+                  ),
+                )
+              ],
+            )));
+  }
+
+  gettingTotalPrice() => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            'Total price',
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+          ),
+          Text(
+            totalPrice.value.toString(),
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+          )
+        ],
+      );
+
+  deliveryCharges() => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: const [
+          Text(
+            'Delivery changes',
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            '40',
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+          )
+        ],
+      );
+}
+
+class BuildingMore extends StatelessWidget {
+  const BuildingMore({super.key, required this.categoryToBeDisplayed});
+
+  final Books categoryToBeDisplayed;
+
+  whichMore(BuildContext context) {
+    if (categoryToBeDisplayed.category == 'Self Help') {
+      return selfHelpCategoryBuilder(context, true);
+    } else if (categoryToBeDisplayed.category == 'Biography') {
+      return biographyCategoryBuilder(context, true);
+    } else if (categoryToBeDisplayed.category == 'Novel') {
+      return novelCategoryBuilder(context, true);
+    } else if (categoryToBeDisplayed.category == 'Non Fiction') {
+      return nonFictionCategoryBuilder(context, true);
+    } else if (categoryToBeDisplayed.category == 'Fiction') {
+      return fictionCategoryBuilder(context, true);
+    } else {
+      return nonFictionCategoryBuilder(context, true);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const SizedBox(
+          height: 20,
+        ),
+        whichMore(context)
+      ],
     );
   }
 }

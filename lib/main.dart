@@ -1,12 +1,10 @@
-import 'dart:math';
-
 import 'package:firebase_1/Themeing/themeing.dart';
 import 'package:firebase_1/authenticate/authenticating.dart';
 import 'package:firebase_1/firebase_options.dart';
-import 'package:firebase_1/screens/book/book_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,26 +13,39 @@ void main(List<String> args) async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarContrastEnforced: true));
+
   runApp(const App());
 }
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   const App({Key? key}) : super(key: key);
 
   @override
+  State<App> createState() => _AppState();
+}
+
+
+class _AppState extends State<App> {
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,
       scaffoldMessengerKey: Utilis.messengerKey,
       title: 'Flutter Meetup',
-      theme: themeing(),
+      theme: MyThemes.lightTheme,
       home: const MainPage(),
       scrollBehavior: const ConstantScrollBehavior(),
     );
   }
-}
+
+ 
+  }
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);

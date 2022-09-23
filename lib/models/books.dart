@@ -1,3 +1,4 @@
+import 'package:firebase_1/database/descriptions.dart';
 import 'package:firebase_1/database/img_urls.dart';
 
 class Books {
@@ -6,11 +7,13 @@ class Books {
   late bool isActive;
   late Map<String, String> bookNameWithAuthor;
   late List<String> listOfImgUrls;
+  late List<String> listOfDescriptions;
 
   Books.all()
       : category = 'All',
         isActive = false,
         listOfImgUrls = allImgLinks,
+        listOfDescriptions = listOfAllDescriptions,
         //<NameOfBook, Author>
         bookNameWithAuthor = {
           'Think And grow rich': 'Napolean Hill',
@@ -54,6 +57,7 @@ class Books {
       : category = 'Biography',
         isActive = false,
         listOfImgUrls = biographyImgLinks,
+        listOfDescriptions = listOfBiographiesDescriptions,
         bookNameWithAuthor = {
           'Steve Jobs': 'Walter Isaacson',
           'A Beautiful Mind': 'Sylvia Nasar',
@@ -88,10 +92,11 @@ class Books {
       : category = 'Fiction',
         isActive = false,
         listOfImgUrls = fictionImgLinks,
+        listOfDescriptions = listOfFictionDescriptions,
         bookNameWithAuthor = {
           'The Maid': 'Nita Prose',
           'Olga Dies Dreaming': 'Xochitl Gonzalez',
-          'The Harry Potter And the Philosopheres stone': 'J.K.Rowling',
+          "The Harry Potter And the Philosopher's stone": 'J.K.Rowling',
           "The Lord of the Rings Trilogy": 'J.R.R. Tolkien',
           'The Count of Monte Cristo': 'Alexandre Dumas',
           'To Kill a Mockingbird': 'Harper Lee',
@@ -108,6 +113,7 @@ class Books {
       : category = 'Non Fiction',
         isActive = false,
         listOfImgUrls = nonFictionImgLinks,
+        listOfDescriptions = listOfNonFictionDescriptions,
         bookNameWithAuthor = {
           'Shoe-dog ': 'Phil knight',
           'We Should All Be Feminists': 'Chimamanda Ngozi Adichie',
@@ -130,6 +136,7 @@ class Books {
       : category = 'Novel',
         isActive = false,
         listOfImgUrls = novelsImgLinks,
+        listOfDescriptions = listOfNovelsDescriptions,
         bookNameWithAuthor = {
           'ULYSSES': 'James Joyce',
           'THE GREAT GATSBY': 'F. Scott Fitzgerald',
@@ -159,6 +166,7 @@ class Books {
       : category = 'Self Help',
         isActive = false,
         listOfImgUrls = selfHelpImgLinks,
+        listOfDescriptions = listOfSelfHelpDescriptions,
         bookNameWithAuthor = {
           'Think And grow rich': 'Napolean Hill',
           'Rich Dad Poor Dad': 'Robert Kiyosaki',

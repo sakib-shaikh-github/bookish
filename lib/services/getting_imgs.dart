@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 Future<Image?> getIImage(BuildContext context, String imgUrl) async {
   Image? image;
 
-  await Future.delayed(Duration(seconds: Random().nextInt(4)));
+  await Future.delayed(Duration(seconds: Random().nextInt(3)));
 
   image = Image.network(
     imgUrl,

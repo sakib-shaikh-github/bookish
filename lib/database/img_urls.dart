@@ -48,7 +48,7 @@ List<String> allImgLinks = [
   'https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSoNyuzcv7QRvCWnW4gQS7JOCdLUU0bMsKZFmmKToAMu3emFm4jGb5hQ2e1f8h92t8bNZWfC8y78hmJkKOfPxMgImh2WyTO1xwjuLhab6MJ&usqp=CAE',
   'https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRr5z-MfXSgj7g3czUg_RNoy1_2wBDJi7ww7HQFuQ76zSgzoB74Gmu94BwnrTdc31sPYEnSrnlPzsQZOsV2rF2L2GsgZh-iiElvClWZoTpU67YQW8DT50RSnA&usqp=CAE',
   'https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRudQt8jDaVD-vkvvnLNRfo2dAJ9BEaN5XfVgDN5QSmrQzqXP1-IhE3HwLfIWroxkn2OmPN8GkBAYAFMqJM2Jy5Af3iElQOo2GoBFSYsMLSNya_uP-OdSgV&usqp=CAE',
-  'https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRudQt8jDaVD-vkvvnLNRfo2dAJ9BEaN5XfVgDN5QSmrQzqXP1-IhE3HwLfIWroxkn2OmPN8GkBAYAFMqJM2Jy5Af3iElQOo2GoBFSYsMLSNya_uP-OdSgV&usqp=CAE',
+  'https://m.media-amazon.com/images/I/71wR8wezE1L._AC_UY218_.jpg',
   'https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTol0Ip2ejO6Nv70EpPGC7sIAjbPRn8t4xbRZp16yWZh9lrpyiblvuu2uz22OD1Jx05qe9AEU3Fl3FZFqAhucTrsQLIvsWifg6gp9tG_o0&usqp=CAE',
   'https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSajjUAbmuj8v58z0IBnYnWD0KmAu03IzFt4Z_7oB1w8QoJSxYrSVO55FBOmsTPgu7JxSZUkmksZynHLzPh2y8b-20XgPewcE8zzU6CsljDnYF0IPMC9ZKPRw&usqp=CAE',
   'https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcREzUY4oQFrPFGZkuSC6jmjYLN1Lv6pIs0NKNna8trQGUT5FtKsMJ9m6lxGv01IjD8JLZQEDTAR_WbuuZ8NqLgQ_3DpYS-3aP_gk_W4aCKCvfPggaziDfbHtQ&usqp=CAE',
