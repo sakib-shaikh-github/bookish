@@ -16,24 +16,24 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
-  bool isLogin = true;
+  bool isSignIn = true;
   @override
-  Widget build(BuildContext context) => isLogin
-      ? LoginWidget(onClickedSignUp: toggle)
-      : LogUpWidget(onClickedSignUp: toggle);
+  Widget build(BuildContext context) => isSignIn
+      ? SignInLoginWidget(onClickedSignUp: toggle)
+      : SignupWidget(onClickedSignUp: toggle);
 
-  void toggle() => setState(() => isLogin = !isLogin);
+  void toggle() => setState(() => isSignIn = !isSignIn);
 }
 
-class LogUpWidget extends StatefulWidget {
+class SignupWidget extends StatefulWidget {
   final VoidCallback onClickedSignUp;
-  const LogUpWidget({super.key, required this.onClickedSignUp});
+  const SignupWidget({super.key, required this.onClickedSignUp});
 
   @override
-  State<LogUpWidget> createState() => _LogUpWidgetState();
+  State<SignupWidget> createState() => _SignupWidgetState();
 }
 
-class _LogUpWidgetState extends State<LogUpWidget> {
+class _SignupWidgetState extends State<SignupWidget> {
   var formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -103,7 +103,7 @@ class _LogUpWidgetState extends State<LogUpWidget> {
                       signUp();
                     },
                     icon: const Icon(Icons.person_add_alt_1_outlined),
-                    label: const Text('Log up')),
+                    label: const Text('Sign up')),
 
                 //Sign Up
                 const SizedBox(
@@ -115,7 +115,7 @@ class _LogUpWidgetState extends State<LogUpWidget> {
                         style: Theme.of(context).textTheme.bodyText2,
                         children: [
                       TextSpan(
-                        text: '  Log In',
+                        text: '  Sign In',
                         style: const TextStyle(
                           color: Colors.blue,
                         ),
@@ -158,15 +158,15 @@ class _LogUpWidgetState extends State<LogUpWidget> {
   }
 }
 
-class LoginWidget extends StatefulWidget {
+class SignInLoginWidget extends StatefulWidget {
   final VoidCallback onClickedSignUp;
-  const LoginWidget({super.key, required this.onClickedSignUp});
+  const SignInLoginWidget({super.key, required this.onClickedSignUp});
 
   @override
-  State<LoginWidget> createState() => _LoginWidgetState();
+  State<SignInLoginWidget> createState() => _SignInLoginWidgetState();
 }
 
-class _LoginWidgetState extends State<LoginWidget> {
+class _SignInLoginWidgetState extends State<SignInLoginWidget> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isObsured = true;
@@ -220,7 +220,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                     signIn();
                   },
                   icon: const Icon(Icons.login_outlined),
-                  label: const Text('Log In')),
+                  label: const Text('Sign In')),
 
               //Forgot password
               const SizedBox(
@@ -382,6 +382,7 @@ class Utilis {
       ..removeCurrentSnackBar()
       ..showSnackBar(snackBar);
   }
+
 }
 
 class VerifyEmailPage extends StatefulWidget {

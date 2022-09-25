@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_1/authenticate/authenticating.dart';
-import 'package:firebase_1/database/descriptions.dart';
 import 'package:firebase_1/models/books.dart';
 import 'package:firebase_1/screens/Home/model/categories_builder.dart';
 import 'package:firebase_1/services/price_assign.dart';
@@ -44,7 +42,10 @@ class _BookState extends State<Book> {
                 gradient: LinearGradient(
                     begin: Alignment.bottomCenter,
                     end: Alignment.center,
-                    colors: [Colors.deepPurple[100]!, Colors.white])),
+                    colors: [
+                  Theme.of(context).colorScheme.primary,
+                  Colors.white
+                ])),
             child: Center(
               child: SizedBox(
                   height: 200,
@@ -86,10 +87,10 @@ class _BookState extends State<Book> {
                 //3
                 Text(
                     'Rs.${assigningPricesWRTCategory(widget.categoryToBeDisplayed)[widget.index]}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
-                      color: Color(0xFF8D7DAC),
+                      color: gettingColorsForPrice()
                     )),
                 const SizedBox(
                   height: 10,
@@ -101,7 +102,10 @@ class _BookState extends State<Book> {
                         widget.categoryToBeDisplayed)[widget.index]),
 
                 //5
-                BuildingDescription(categoryToBeDisplayed: widget.categoryToBeDisplayed,index: widget.index,),
+                BuildingDescription(
+                  categoryToBeDisplayed: widget.categoryToBeDisplayed,
+                  index: widget.index,
+                ),
 
                 //6
                 aboutQuality(),
@@ -117,14 +121,9 @@ class _BookState extends State<Book> {
   }
 }
 
-ValueNotifier<int> totalPrice = ValueNotifier(0); //Global
-
 class BuildingDescription extends StatefulWidget {
-  const BuildingDescription({
-    super.key,
-    required this.categoryToBeDisplayed,
-    required this.index
-  });
+  const BuildingDescription(
+      {super.key, required this.categoryToBeDisplayed, required this.index});
 
   final int index;
   final Books categoryToBeDisplayed;
@@ -134,12 +133,12 @@ class BuildingDescription extends StatefulWidget {
 }
 
 class _BuildingDescriptionState extends State<BuildingDescription> {
-
   String formattedDescription = '';
   bool toShowMore = false;
   @override
   Widget build(BuildContext context) {
-    String description = widget.categoryToBeDisplayed.listOfDescriptions[widget.index];
+    String description =
+        widget.categoryToBeDisplayed.listOfDescriptions[widget.index];
     return Wrap(
       runSpacing: 10,
       children: [
@@ -169,7 +168,7 @@ class _BuildingDescriptionState extends State<BuildingDescription> {
 
   String formattingDescription(String description) {
     if (description.length > 500 && !toShowMore) {
-      return formattedDescription = 
+      return formattedDescription =
           " ${description.replaceRange(500, description.length, '')}";
     } else {
       return formattedDescription = " $description";
@@ -213,6 +212,7 @@ class ShoppingTab extends StatefulWidget {
 
 class _ShoppingTabState extends State<ShoppingTab> {
   int quantity = 0;
+  int totalPrice = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -234,7 +234,7 @@ class _ShoppingTabState extends State<ShoppingTab> {
                       onPressed: () => setState(() {
                             if (1 <= quantity && quantity <= 10) {
                               quantity -= 1;
-                              totalPrice.value -= widget.price;
+                              totalPrice -= widget.price;
                             } else {
                               quantity;
                             }
@@ -262,7 +262,7 @@ class _ShoppingTabState extends State<ShoppingTab> {
                       onPressed: () => setState(() {
                             if (0 <= quantity && quantity < 10) {
                               quantity += 1;
-                              totalPrice.value += widget.price;
+                              totalPrice += widget.price;
                             } else {
                               quantity;
                               Utilis.showSnackBar('No more than 10. Sorry😕',
@@ -283,7 +283,7 @@ class _ShoppingTabState extends State<ShoppingTab> {
                 width: 140,
               ),
               Text(
-                totalPrice.value.toString(),
+                totalPrice.toString(),
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
@@ -327,76 +327,6 @@ aboutQuality() {
       Text(quality)
     ],
   );
-}
-
-class DeliveringDetails extends StatefulWidget {
-  const DeliveringDetails({super.key});
-
-  @override
-  State<DeliveringDetails> createState() => _DeliveringDetailsState();
-}
-
-class _DeliveringDetailsState extends State<DeliveringDetails> {
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-        valueListenable: totalPrice,
-        builder: ((context, value, child) => Wrap(
-              runSpacing: 10,
-              children: [
-                const Divider(
-                  thickness: 1,
-                  height: 20,
-                  indent: 40,
-                  endIndent: 50,
-                ),
-                const Text(
-                  'Delivering details',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: Wrap(
-                    runSpacing: 6,
-                    children: [
-                      //1
-                      gettingTotalPrice(),
-                      //2
-                      deliveryCharges()
-                    ],
-                  ),
-                )
-              ],
-            )));
-  }
-
-  gettingTotalPrice() => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            'Total price',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-          ),
-          Text(
-            totalPrice.value.toString(),
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-          )
-        ],
-      );
-
-  deliveryCharges() => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: const [
-          Text(
-            'Delivery changes',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            '40',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-          )
-        ],
-      );
 }
 
 class BuildingMore extends StatelessWidget {

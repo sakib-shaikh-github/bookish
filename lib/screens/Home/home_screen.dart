@@ -1,7 +1,12 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:firebase_1/main.dart';
 import 'package:firebase_1/screens/Home/Utilis/category_pressed.dart';
 import 'package:firebase_1/screens/Home/model/categories_builder.dart';
+import 'package:firebase_1/screens/settings/settings_screen.dart';
+import 'package:firebase_1/services/bottom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_1/models/books.dart';
@@ -20,7 +25,13 @@ class HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: appBar(),
       body: body(),
-      drawer: drawer(),
+      bottomNavigationBar: bottomAppBar(context),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.of(context)
+            .push(MaterialPageRoute(builder: ((context) => SettingsScreen()))),
+        child: Icon(Icons.shopping_cart_checkout_rounded),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
@@ -55,7 +66,11 @@ class HomeScreenState extends State<HomeScreen> {
           ],
         ),
         IconButton(
-            onPressed: () => FirebaseAuth.instance.signOut(),
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+              Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: ((context) => MainPage())));
+            },
             icon: const Icon(Icons.logout))
       ],
     );
@@ -119,8 +134,7 @@ class HomeScreenState extends State<HomeScreen> {
                                             ? ButtonStyle(
                                                 backgroundColor:
                                                     MaterialStateProperty.all(
-                                                        const Color(
-                                                            0xFFD1C4E9)),
+                                                        Theme.of(context).colorScheme.primary),
                                               )
                                             : null,
                                         child: Text(bookObjs[index].category)),
@@ -160,25 +174,32 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  drawer() {
-    buildDrawerItem(String title, Widget widget) {
-      return ListTile(
-        title: Text(title),
-        trailing: widget,
-      );
+  curvedNavigationBar(BuildContext context) {
+    onButtonTap(int index) {
+      if (index == 0) {
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => HomeScreen()));
+      } else if (index == 1) {
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => HomeScreen()));
+      } else if (index == 2) {
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => SettingsScreen()));
+      }
     }
 
-    return Drawer(
-      width: 250,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: ListView(
-          children: [buildDrawerItem('Profile', Text(''))],
-        ),
-      ),
-    );
+    return CurvedNavigationBar(
+        height: 50,
+        backgroundColor: Theme.of(context).primaryColor,
+        items: [
+          IconButton(
+              onPressed: () => onButtonTap(0), icon: Icon(Icons.home_rounded)),
+          IconButton(
+              onPressed: () => onButtonTap(1),
+              icon: Icon(Icons.shopping_cart_checkout_rounded)),
+          IconButton(
+              onPressed: () => onButtonTap(2),
+              icon: Icon(Icons.more_horiz_rounded)),
+        ]);
   }
 }

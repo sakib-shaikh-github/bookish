@@ -1,9 +1,11 @@
+import 'package:firebase_1/Themeing/themeing.dart';
 import 'package:firebase_1/models/books.dart';
 import 'package:firebase_1/screens/Home/home_screen.dart';
 import 'package:firebase_1/screens/book/book_screen.dart';
 import 'package:firebase_1/services/getting_imgs.dart';
 import 'package:firebase_1/services/price_assign.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_1/main.dart';
 
 categoryBuilder(Books categoryToBeDisplayed, int index, BuildContext context) =>
     SizedBox(
@@ -47,8 +49,8 @@ categoryBuilder(Books categoryToBeDisplayed, int index, BuildContext context) =>
                         ),
                         Text(
                           'Rs.${assigningPricesWRTCategory(categoryToBeDisplayed)[index]}',
-                          style: const TextStyle(
-                              color: Color(0xFF8D7DAC),
+                          style: TextStyle(
+                              color: gettingColorsForPrice(),
                               fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -341,4 +343,18 @@ selfHelpCategoryBuilder(BuildContext context, [bool toShowMore = false]) {
       ),
     ],
   );
+}
+
+gettingColorsForPrice() {
+  if (currentTheme == Color(0xFFC4E4E9)) {
+    return Color(0xFF7FA5AB);
+  } else if (currentTheme == Color(0xFFAEE6A6)) {
+    return Color(0xFF66bb6a);
+  } else if (currentTheme == Color(0xFF464846)) {
+    return Color(0xFFb0bec5);
+  } else if (currentTheme == Color(0XFFf48fb1)) {
+    return Color(0xFFec407a);
+  } else {
+    return Color(0xFF9575cd);
+  }
 }

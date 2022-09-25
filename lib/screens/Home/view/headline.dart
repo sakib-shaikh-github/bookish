@@ -15,7 +15,7 @@ Padding headLine(BuildContext context) {
           height: 50,
           width: 70,
           child: CustomPaint(
-            painter: ForHeadlineDesign(),
+            painter: ForHeadlineDesign(context: context),
           ),
         ),
       )

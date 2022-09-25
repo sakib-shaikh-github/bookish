@@ -118,7 +118,7 @@ class Books {
           'Shoe-dog ': 'Phil knight',
           'We Should All Be Feminists': 'Chimamanda Ngozi Adichie',
           'A Short History of Nearly Everything': 'Bill Bryson',
-          'Why I am an atheist is an incredibly thought provoking':
+          'Why I am an atheist':
               'Bhagat Singh',
           'A Promised Land': 'Barack Obama',
           'The Self-Care Project': 'Jayne Hardy',

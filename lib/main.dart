@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_1/Themeing/themeing.dart';
 import 'package:firebase_1/authenticate/authenticating.dart';
 import 'package:firebase_1/firebase_options.dart';
@@ -17,6 +18,12 @@ void main(List<String> args) async {
       statusBarColor: Colors.transparent,
       systemNavigationBarContrastEnforced: true));
 
+  final userData = FirebaseFirestore.instance
+      .collection('users')
+      .doc('4SnahVY2kUmKT87R7mjd')
+      .snapshots()
+      .map((snapshot) => snapshot.data());
+
   runApp(const App());
 }
 
@@ -26,26 +33,23 @@ class App extends StatefulWidget {
   const App({Key? key}) : super(key: key);
 
   @override
-  State<App> createState() => _AppState();
+  State<App> createState() => AppState();
 }
 
-
-class _AppState extends State<App> {
+class AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,
       scaffoldMessengerKey: Utilis.messengerKey,
-      title: 'Flutter Meetup',
-      theme: MyThemes.lightTheme,
+      title: 'Bookish',
+      theme: MyThemes().lightTheme,
       home: const MainPage(),
       scrollBehavior: const ConstantScrollBehavior(),
     );
   }
-
- 
-  }
+}
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);

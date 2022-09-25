@@ -1,10 +1,16 @@
+
+
 import 'package:flutter/material.dart';
 
 class ForHeadlineDesign extends CustomPainter {
+  BuildContext context;
+  ForHeadlineDesign({
+    required this.context,
+  });
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint()
-      ..color = const Color(0xFFD1C4E9)
+      ..color = Theme.of(context).colorScheme.primary
       ..style = PaintingStyle.stroke
       ..strokeWidth = 5.0;
 
