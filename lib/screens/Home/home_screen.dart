@@ -1,11 +1,9 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_1/main.dart';
 import 'package:firebase_1/screens/Home/Utilis/category_pressed.dart';
 import 'package:firebase_1/screens/Home/model/categories_builder.dart';
-import 'package:firebase_1/screens/settings/settings_screen.dart';
+import 'package:firebase_1/screens/cart.dart';
 import 'package:firebase_1/services/bottom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +26,7 @@ class HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: bottomAppBar(context),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.of(context)
-            .push(MaterialPageRoute(builder: ((context) => SettingsScreen()))),
+            .push(MaterialPageRoute(builder: ((context) => CartScreen()))),
         child: Icon(Icons.shopping_cart_checkout_rounded),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -36,44 +34,34 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   appBar() {
-    Size size = MediaQuery.of(context).size;
-    double height = size.height;
-    double width = size.width;
     return AppBar(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      elevation: 0,
-      title: Text('$height, $width'),
-      actions: [
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.search_rounded),
-        ),
-        Stack(
-          children: [
-            IconButton(
-              padding: const EdgeInsets.only(top: 10),
-              onPressed: () {},
-              icon: const Icon(Icons.shopping_bag_outlined),
-            ),
-            const Positioned(
-              right: 8,
-              top: 12,
-              child: CircleAvatar(
-                radius: 5,
-                backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.background,
+        elevation: 0,
+        actions: [
+          Expanded(
+            child: Card(
+              elevation: 1,
+              child: ListTile(
+                onTap: () => showSearch(
+                  context: context,
+                  delegate: MySearchDelegate(),
+                ),
+                title: Text('Search'),
+                leading: Icon(
+                  (Icons.search_rounded),
+                ),
               ),
             ),
-          ],
-        ),
-        IconButton(
+          ),
+          IconButton(
             onPressed: () {
               FirebaseAuth.instance.signOut();
               Navigator.of(context).pushReplacement(
                   MaterialPageRoute(builder: ((context) => MainPage())));
             },
-            icon: const Icon(Icons.logout))
-      ],
-    );
+            icon: Icon(Icons.logout),
+          )
+        ]);
   }
 
   body() {
@@ -134,7 +122,9 @@ class HomeScreenState extends State<HomeScreen> {
                                             ? ButtonStyle(
                                                 backgroundColor:
                                                     MaterialStateProperty.all(
-                                                        Theme.of(context).colorScheme.primary),
+                                                        Theme.of(context)
+                                                            .colorScheme
+                                                            .primary),
                                               )
                                             : null,
                                         child: Text(bookObjs[index].category)),
@@ -173,33 +163,69 @@ class HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
 
-  curvedNavigationBar(BuildContext context) {
-    onButtonTap(int index) {
-      if (index == 0) {
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => HomeScreen()));
-      } else if (index == 1) {
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => HomeScreen()));
-      } else if (index == 2) {
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => SettingsScreen()));
+class MySearchDelegate extends SearchDelegate {
+  static List<Books> bookObjs = [
+    Books.all(),
+    Books.biography(),
+    Books.fiction(),
+    Books.nonFiction(),
+    Books.novel(),
+    Books.selfHelp()
+  ];
+
+  List<String> searchResults = [];
+  List<int> indexesOf = [];
+  @override
+  List<Widget>? buildActions(BuildContext context) => [
+        IconButton(
+            onPressed: (() {
+              query = '';
+            }),
+            icon: Icon(Icons.clear)),
+      ];
+
+  @override
+  Widget? buildLeading(BuildContext context) => IconButton(
+      onPressed: (() => close(context, null)), icon: Icon(Icons.arrow_back));
+
+  @override
+  Widget buildResults(BuildContext context) => Center(
+        child: Text(query),
+      );
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    for (var objs in bookObjs) {
+      for (var key in objs.bookNameWithAuthor.keys) {
+        searchResults.add(key);
+        for (var image in objs.listOfImgUrls) {
+          indexesOf.add(objs.listOfImgUrls.indexOf(image));
+        }
       }
     }
+    List listOfSuggestions = searchResults.where((name) {
+      final result = name.toLowerCase();
+      final input = query.toLowerCase();
 
-    return CurvedNavigationBar(
-        height: 50,
-        backgroundColor: Theme.of(context).primaryColor,
-        items: [
-          IconButton(
-              onPressed: () => onButtonTap(0), icon: Icon(Icons.home_rounded)),
-          IconButton(
-              onPressed: () => onButtonTap(1),
-              icon: Icon(Icons.shopping_cart_checkout_rounded)),
-          IconButton(
-              onPressed: () => onButtonTap(2),
-              icon: Icon(Icons.more_horiz_rounded)),
-        ]);
+      return result.contains(input);
+    }).toList();
+
+    return ListView.builder(
+        itemCount: listOfSuggestions.length,
+        itemBuilder: ((context, index) {
+          String suggestion = listOfSuggestions[index];
+
+          return ListTile(
+            title: Text(suggestion),
+            onTap: () {
+              query = suggestion;
+              showResults(context);
+            },
+          );
+        }));
   }
 }
+
+

@@ -5,7 +5,6 @@ import 'package:firebase_1/screens/book/book_screen.dart';
 import 'package:firebase_1/services/getting_imgs.dart';
 import 'package:firebase_1/services/price_assign.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_1/main.dart';
 
 categoryBuilder(Books categoryToBeDisplayed, int index, BuildContext context) =>
     SizedBox(

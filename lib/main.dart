@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_1/Themeing/themeing.dart';
 import 'package:firebase_1/authenticate/authenticating.dart';
 import 'package:firebase_1/firebase_options.dart';
@@ -17,12 +16,6 @@ void main(List<String> args) async {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       systemNavigationBarContrastEnforced: true));
-
-  final userData = FirebaseFirestore.instance
-      .collection('users')
-      .doc('4SnahVY2kUmKT87R7mjd')
-      .snapshots()
-      .map((snapshot) => snapshot.data());
 
   runApp(const App());
 }

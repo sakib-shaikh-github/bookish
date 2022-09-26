@@ -1,7 +1,10 @@
 import 'package:firebase_1/authenticate/authenticating.dart';
 import 'package:firebase_1/models/books.dart';
 import 'package:firebase_1/screens/Home/model/categories_builder.dart';
+import 'package:firebase_1/screens/cart.dart';
+import 'package:firebase_1/services/bottom_appbar.dart';
 import 'package:firebase_1/services/price_assign.dart';
+import 'package:firebase_1/stateManagment/cart_provider.dart';
 import 'package:flutter/material.dart';
 
 class Book extends StatefulWidget {
@@ -27,6 +30,13 @@ class _BookState extends State<Book> {
           sliverMainPage(),
         ],
       ),
+      bottomNavigationBar: bottomAppBar(context),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.of(context)
+            .push(MaterialPageRoute(builder: ((context) => CartScreen()))),
+        child: Icon(Icons.shopping_cart_checkout_rounded),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
@@ -88,10 +98,9 @@ class _BookState extends State<Book> {
                 Text(
                     'Rs.${assigningPricesWRTCategory(widget.categoryToBeDisplayed)[widget.index]}',
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: gettingColorsForPrice()
-                    )),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: gettingColorsForPrice())),
                 const SizedBox(
                   height: 10,
                 ),
@@ -99,7 +108,9 @@ class _BookState extends State<Book> {
                 //4
                 ShoppingTab(
                     price: assigningPricesWRTCategory(
-                        widget.categoryToBeDisplayed)[widget.index]),
+                        widget.categoryToBeDisplayed)[widget.index],
+                    categoryToBeDisplayed: widget.categoryToBeDisplayed,
+                    index: widget.index),
 
                 //5
                 BuildingDescription(
@@ -203,8 +214,14 @@ class _BuildingDescriptionState extends State<BuildingDescription> {
 }
 
 class ShoppingTab extends StatefulWidget {
-  const ShoppingTab({super.key, required this.price});
+  const ShoppingTab(
+      {super.key,
+      required this.price,
+      required this.categoryToBeDisplayed,
+      required this.index});
   final int price;
+  final Books categoryToBeDisplayed;
+  final int index;
 
   @override
   State<ShoppingTab> createState() => _ShoppingTabState();
@@ -213,6 +230,12 @@ class ShoppingTab extends StatefulWidget {
 class _ShoppingTabState extends State<ShoppingTab> {
   int quantity = 0;
   int totalPrice = 0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -291,7 +314,12 @@ class _ShoppingTabState extends State<ShoppingTab> {
           ),
           //2
           ElevatedButton.icon(
-            onPressed: () {},
+            onPressed: () {
+              var cartProvider = CartProvider();
+
+              return cartProvider.addItems(widget.categoryToBeDisplayed,
+                  widget.index, totalPrice, quantity);
+            },
             icon: const Icon(Icons.add_shopping_cart_rounded),
             label: const Text('Add to cart'),
             style: ButtonStyle(

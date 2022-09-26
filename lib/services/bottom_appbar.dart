@@ -10,7 +10,7 @@ bottomAppBar(BuildContext context) => BottomAppBar(
         children: [
           IconButton(
               tooltip: 'Home',
-              onPressed: () => Navigator.of(context).push(
+              onPressed: () => Navigator.of(context).pushReplacement(
                   MaterialPageRoute(builder: ((context) => HomeScreen()))),
               icon: Icon(
                 Icons.home_rounded,
@@ -18,7 +18,7 @@ bottomAppBar(BuildContext context) => BottomAppBar(
               )),
           IconButton(
               tooltip: 'Settings',
-              onPressed: () => Navigator.of(context).push(
+              onPressed: () => Navigator.of(context).pushReplacement(
                   MaterialPageRoute(builder: ((context) => SettingsScreen()))),
               icon: Icon(Icons.more_horiz_rounded, size: 30)),
         ],

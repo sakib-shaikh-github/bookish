@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_1/authenticate/authenticating.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -30,12 +28,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       bottomNavigationBar: bottomAppBar(context),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: ((context) => CartScreen())));
+        },
         child: Icon(Icons.shopping_cart_checkout_rounded),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
+
+  bool isFirstTime = true;
 
   settingsView() {
     return Column(
@@ -43,10 +46,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ListTile(
-          leading: Text('Profile'),
-          trailing: Icon(Icons.person_rounded),
-          onTap: (() => dialogOfProfile()),
-        ),
+            leading: Text('Profile'),
+            trailing: Icon(Icons.person_rounded),
+            onTap: (() => isFirstTime
+                ? Navigator.of(context).push(MaterialPageRoute(
+                    builder: ((context) => createUserProfile())))
+                : dialogOfUserProfile(context))),
         ListTile(
           leading: Text('Your Orders'),
           trailing: Icon(Icons.shopping_bag_rounded),
@@ -62,6 +67,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
           leading: Text('Switch theme'),
           trailing: Icon(Icons.colorize_rounded),
           onTap: (() => dialogOfSwitchingTheme()),
+        ),
+        ListTile(
+          leading: Text('Sign out'),
+          trailing: Icon(Icons.logout_rounded),
+          onTap: (() {
+            FirebaseAuth.instance.signOut();
+            Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: ((context) => MainPage())));
+          }),
         ),
       ],
     );
@@ -114,6 +128,143 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ))
             ],
           )),
+    );
+  }
+
+  dialogOfUserProfile(
+    BuildContext context,
+  ) {
+    showintProfileImage() {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 110,
+          ),
+          CircleAvatar(
+            radius: 20,
+            child: Icon(Icons.person),
+          ),
+        ],
+      );
+    }
+
+    return showDialog(
+        context: context,
+        builder: ((context) => AlertDialog(
+              contentPadding: const EdgeInsets.all(2),
+              content: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Wrap(
+                      direction: Axis.vertical,
+                      runSpacing: 5,
+                      spacing: 10,
+                      children: [
+                        showintProfileImage(),
+                        Text(
+                          'Name',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w600),
+                        ),
+                        Text('null'),
+                        Text(
+                          'Age',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w600),
+                        ),
+                        Text('null'),
+                        Text(
+                          'Email',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w600),
+                        ),
+                        Text('null'),
+                      ]),
+                ),
+              ),
+              actions: [
+                Text(
+                  '*Your profile has been created successfully but displaying is under development',
+                  style: TextStyle(color: Colors.red),
+                ),
+                TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text(
+                      'Back',
+                      style: TextStyle(color: Colors.blue),
+                    ))
+              ],
+            )));
+  }
+
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _ageController = TextEditingController();
+  final getUserEmail = FirebaseAuth.instance.currentUser!.email;
+
+  createUserProfile() {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Create Profile'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            textfields(_nameController, 'Full name', null),
+            SizedBox(
+              height: 5,
+            ),
+            textfields(_ageController, 'Age', TextInputType.number),
+            SizedBox(
+              height: 5,
+            ),
+            ElevatedButton(
+                onPressed: () => createUser(context),
+                child: Text('Create Profile'))
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future createUser(BuildContext context) async {
+    final docUser = FirebaseFirestore.instance.collection('users').doc();
+
+    final jsonDoc = User(
+        name: _nameController.text.trim(),
+        age: _ageController.text.trim(),
+        userId: FirebaseFirestore.instance.hashCode,
+        userEmail: getUserEmail.toString().trim());
+
+    try {
+      await docUser.set(jsonDoc.toJson());
+      ToastContext().init(context);
+      Toast.show('Profile created successfully', duration: 3);
+      Navigator.of(context).pop();
+      isFirstTime = false;
+    } on FirebaseException catch (_) {
+      Utilis.showSnackBar('Error creating profile. Try again later');
+      Navigator.of(context).pop();
+    }
+
+    if (!mounted) {
+      _nameController.dispose();
+      _ageController.dispose();
+    }
+  }
+
+  textfields(TextEditingController controller, String hintText,
+      TextInputType? inputType) {
+    return SizedBox(
+      height: 80,
+      width: 250,
+      child: TextField(
+        keyboardType: inputType,
+        controller: controller,
+        decoration:
+            InputDecoration(hintText: hintText, border: OutlineInputBorder()),
+      ),
     );
   }
 
@@ -171,174 +322,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           )),
     );
   }
-
-  dialogOfProfile() {
-    bool profileCreated = false;
-
-    return dialogOfShowProfile();
-  }
-
-  dialogOfShowProfile() {
-    return showDialog(
-      context: context,
-      builder: ((context) => AlertDialog(
-            contentPadding: const EdgeInsets.all(2),
-            content: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: ShowProfile(),
-              ),
-            ),
-            actions: [
-              TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text(
-                    'Back',
-                    style: TextStyle(color: Colors.blue),
-                  ))
-            ],
-          )),
-    );
-  }
-}
-
-class CreateProfile extends StatefulWidget {
-  const CreateProfile({super.key});
-
-  @override
-  State<CreateProfile> createState() => _CreateProfileState();
-}
-
-class _CreateProfileState extends State<CreateProfile> {
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _ageController = TextEditingController();
-
-  bool profileCreated = false;
-  final getUserEmail = FirebaseAuth.instance.currentUser!.email;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Create Profile'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            textfields(_nameController, 'Full name', null),
-            SizedBox(
-              height: 5,
-            ),
-            textfields(_ageController, 'Age', TextInputType.number),
-            SizedBox(
-              height: 5,
-            ),
-            ElevatedButton(
-                onPressed: () => createUser(context),
-                child: Text('Create Profile'))
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future createUser(BuildContext context) async {
-    final docUser = FirebaseFirestore.instance
-        .collection('users')
-        .doc('${_nameController.text.trim()}');
-
-    final jsonDoc = User(
-        name: _nameController.text.trim(),
-        age: _ageController.text.trim(),
-        userId: FirebaseFirestore.instance.hashCode,
-        userEmail: getUserEmail.toString().trim());
-
-    try {
-      await docUser.set(jsonDoc.toJson());
-      profileCreated = true;
-      ToastContext().init(context);
-      Toast.show('Profile created successfully', duration: 3);
-    } on FirebaseException catch (_) {
-      Utilis.showSnackBar('Error creating profile. Try again later');
-    }
-
-    if (!mounted) {
-      _nameController.dispose();
-      _ageController.dispose();
-    }
-
-    Navigator.pop(context);
-  }
-
-  textfields(TextEditingController controller, String hintText,
-      TextInputType? inputType) {
-    return SizedBox(
-      height: 80,
-      width: 250,
-      child: TextField(
-        keyboardType: inputType,
-        controller: controller,
-        decoration:
-            InputDecoration(hintText: hintText, border: OutlineInputBorder()),
-      ),
-    );
-  }
-}
-
-class ShowProfile extends StatefulWidget {
-  const ShowProfile({super.key});
-
-  @override
-  State<ShowProfile> createState() => _ShowProfileState();
-}
-
-class _ShowProfileState extends State<ShowProfile> {
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      direction: Axis.vertical,
-      runSpacing: 5,
-      spacing: 10,
-      children: [
-        showintProfileImage(),
-        Text(
-          'Name',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-        ),
-        Text('Sakib Shaikh'),
-        Text(
-          'Age',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-        ),
-        Text('20'),
-        Text(
-          'Email',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-        ),
-        Text('sms.2002.sakib@gmail.com'),
-      ],
-    );
-  }
-
-  showintProfileImage() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SizedBox(
-          width: 110,
-        ),
-        CircleAvatar(
-          radius: 20,
-          child: Icon(Icons.person),
-        ),
-      ],
-    );
-  }
-
-  readUsers() {
-    final getUsers = FirebaseFirestore.instance.collection('users').snapshots();
-  }
 }
 
 class User {
@@ -359,5 +342,5 @@ class User {
       name: json['name'],
       age: json['age'],
       userEmail: json['userEmail'],
-      userId: json['userId']);
+      userId: json['id']);
 }
