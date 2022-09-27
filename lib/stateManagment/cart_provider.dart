@@ -20,11 +20,5 @@ class CartProvider extends ChangeNotifier {
     listOfQuantities.add(quantity);
 
     notifyListeners();
-
-    print(listOfOrderedBookNames.length);
-    print(listOfOrderedBookImage.length);
-    print(listOfPrices.length);
-    print(listOfOrderedBookNamesAuthor.length);
-    print(listOfQuantities.length);
   }
 }

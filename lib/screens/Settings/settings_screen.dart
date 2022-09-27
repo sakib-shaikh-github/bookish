@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_1/authenticate/authenticating.dart';
+import 'package:firebase_1/screens/orders_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_1/Themeing/themeing.dart';
@@ -51,7 +52,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: (() => isFirstTime
                 ? Navigator.of(context).push(MaterialPageRoute(
                     builder: ((context) => createUserProfile())))
-                : dialogOfUserProfile(context))),
+                : Navigator.of(context).push(MaterialPageRoute(
+                    builder: ((context) => userProfile(context)))))),
         ListTile(
           leading: Text('Your Orders'),
           trailing: Icon(Icons.shopping_bag_rounded),
@@ -131,7 +133,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  dialogOfUserProfile(
+  userProfile(
     BuildContext context,
   ) {
     showintProfileImage() {
@@ -149,53 +151,73 @@ class _SettingsScreenState extends State<SettingsScreen> {
       );
     }
 
-    return showDialog(
-        context: context,
-        builder: ((context) => AlertDialog(
-              contentPadding: const EdgeInsets.all(2),
-              content: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: Wrap(
-                      direction: Axis.vertical,
-                      runSpacing: 5,
-                      spacing: 10,
-                      children: [
-                        showintProfileImage(),
-                        Text(
-                          'Name',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w600),
-                        ),
-                        Text('null'),
-                        Text(
-                          'Age',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w600),
-                        ),
-                        Text('null'),
-                        Text(
-                          'Email',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w600),
-                        ),
-                        Text('null'),
-                      ]),
-                ),
-              ),
-              actions: [
-                Text(
-                  '*Your profile has been created successfully but displaying is under development',
-                  style: TextStyle(color: Colors.red),
-                ),
-                TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text(
-                      'Back',
-                      style: TextStyle(color: Colors.blue),
-                    ))
-              ],
-            )));
+    Stream<List<User>> readUsers() => FirebaseFirestore.instance
+        .collection('users')
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => User.fromJson(doc.data())).toList());
+
+    buildUserProfile(User? currentUser) {
+      return AlertDialog(
+        contentPadding: const EdgeInsets.all(2),
+        content: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Wrap(
+                direction: Axis.vertical,
+                runSpacing: 5,
+                spacing: 10,
+                children: [
+                  showintProfileImage(),
+                  Text(
+                    'Name',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  ),
+                  Text(currentUser!.name),
+                  Text(
+                    'Age',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  ),
+                  Text(currentUser.age),
+                  Text(
+                    'Email',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  ),
+                  Text(currentUser.userEmail),
+                ]),
+          ),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Back',
+                style: TextStyle(color: Colors.blue),
+              ))
+        ],
+      );
+    }
+
+    return Scaffold(
+      body: StreamBuilder<List<User>>(
+          stream: readUsers(),
+          builder: ((context, snapshot) {
+            User? currentUser;
+            if (snapshot.hasData) {
+              final users = snapshot.data;
+              for (var user in users!.map((user) => user)) {
+                if (user.userEmail ==
+                    FirebaseAuth.instance.currentUser!.email) {
+                  currentUser = user;
+                }
+              }
+              return buildUserProfile(currentUser);
+            } else {
+              print(snapshot.error);
+              return Center(child: Text('Error loading profile'));
+            }
+          })),
+    );
   }
 
   TextEditingController _nameController = TextEditingController();

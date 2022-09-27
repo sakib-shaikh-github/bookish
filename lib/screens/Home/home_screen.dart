@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_1/main.dart';
 import 'package:firebase_1/screens/Home/Utilis/category_pressed.dart';
 import 'package:firebase_1/screens/Home/model/categories_builder.dart';
+import 'package:firebase_1/screens/book/book_screen.dart';
 import 'package:firebase_1/screens/cart.dart';
 import 'package:firebase_1/services/bottom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -191,9 +192,11 @@ class MySearchDelegate extends SearchDelegate {
       onPressed: (() => close(context, null)), icon: Icon(Icons.arrow_back));
 
   @override
-  Widget buildResults(BuildContext context) => Center(
-        child: Text(query),
-      );
+  Widget buildResults(BuildContext context) {
+    return Center(
+      child: Text(query),
+    );
+  }
 
   @override
   Widget buildSuggestions(BuildContext context) {
@@ -205,6 +208,7 @@ class MySearchDelegate extends SearchDelegate {
         }
       }
     }
+
     List listOfSuggestions = searchResults.where((name) {
       final result = name.toLowerCase();
       final input = query.toLowerCase();
@@ -219,13 +223,66 @@ class MySearchDelegate extends SearchDelegate {
 
           return ListTile(
             title: Text(suggestion),
-            onTap: () {
-              query = suggestion;
-              showResults(context);
-            },
+            onTap: () => Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: ((context) => navigateTo()))),
           );
         }));
   }
+
+  navigateTo() {
+    for (var objs in bookObjs) {
+      int i = 0;
+      if (objs.category == 'All') {
+        for (var bookName in objs.bookNameWithAuthor.keys) {
+          if (bookName == query) {
+            return Book(categoryToBeDisplayed: objs, index: i);
+          } else {
+            i += 1;
+          } 
+        } 
+      } else if (objs.category == 'Biography') {
+        for (var bookName in objs.bookNameWithAuthor.keys) {
+          if (bookName == query) {
+            return Book(categoryToBeDisplayed: objs, index: i);
+          } else {
+            i += 1;
+          }
+        }
+      } else if (objs.category == 'Fiction') {
+        for (var bookName in objs.bookNameWithAuthor.keys) {
+          if (bookName == query) {
+            return Book(categoryToBeDisplayed: objs, index: i);
+          } else {
+            i += 1;
+          }
+        }
+      } else if (objs.category == 'Non Fiction') {
+        for (var bookName in objs.bookNameWithAuthor.keys) {
+          if (bookName == query) {
+            return Book(categoryToBeDisplayed: objs, index: i);
+          } else {
+            i += 1;
+          }
+        }
+      } else if (objs.category == 'Novel') {
+        for (var bookName in objs.bookNameWithAuthor.keys) {
+          if (bookName == query) {
+            return Book(categoryToBeDisplayed: objs, index: i);
+          } else {
+            i += 1;
+          }
+        }
+      } else if (objs.category == 'Self Help') {
+        for (var bookName in objs.bookNameWithAuthor.keys) {
+          if (bookName == query) {
+            return Book(categoryToBeDisplayed: objs, index: i);
+          } else {
+            i += 1;
+          }
+        }
+      }
+      print('${objs.category}, $i');
+      return Book(categoryToBeDisplayed: objs, index: i);
+    }
+  }
 }
-
-

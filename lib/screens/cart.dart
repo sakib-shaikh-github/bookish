@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'package:firebase_1/authenticate/authenticating.dart';
 import 'package:firebase_1/stateManagment/cart_provider.dart';
+import 'package:toast/toast.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -28,7 +29,6 @@ class _CartScreenState extends State<CartScreen> {
         create: ((context) => CartProvider()),
         builder: ((context, child) {
           return Consumer<CartProvider>(builder: (context, provider, child) {
-            print('works');
             return Column(
               children: [
                 yourOrders(),
@@ -43,39 +43,41 @@ class _CartScreenState extends State<CartScreen> {
 
   yourOrders() {
     return Flexible(
-      child: ListView.builder(
-          itemCount: listOfOrderedBookNames.length,
-          itemBuilder: ((context, index) => Card(
-                child: Dismissible(
-                  onDismissed: ((direction) => setState(() {
-                    listOfOrderedBookNames
-                      .remove(listOfOrderedBookNames[index]);
-                  })),
-                  key: Key(listOfOrderedBookNames[index]),
-                  background: Container(
-                    color: Colors.red,
-                    child: Icon(Icons.delete_forever_rounded),
+        child: ListView.builder(
+      itemCount: listOfOrderedBookNames.length,
+      itemBuilder: ((context, index) {
+        return Card(
+          child: Dismissible(
+            onDismissed: ((direction) => setState(() {
+                  listOfOrderedBookNames.remove(listOfOrderedBookNames[index]);
+                  listOfPrices.remove(listOfPrices[index]);
+                })),
+            key: Key(listOfOrderedBookNames[index]),
+            background: Container(
+              color: Colors.red,
+              child: Icon(Icons.delete_forever_rounded),
+            ),
+            child: ListTile(
+              contentPadding: EdgeInsets.all(8),
+              leading: Image.network(listOfOrderedBookImage[index]),
+              title: Text(listOfOrderedBookNames[index]),
+              subtitle: Text(listOfOrderedBookNamesAuthor[index]),
+              trailing: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    'Rs.' + listOfPrices[index].toString(),
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  child: ListTile(
-                    contentPadding: EdgeInsets.all(8),
-                    leading: Image.network(listOfOrderedBookImage[index]),
-                    title: Text(listOfOrderedBookNames[index]),
-                    subtitle: Text(listOfOrderedBookNamesAuthor[index]),
-                    trailing: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text(
-                          'Rs.' + listOfPrices[index].toString(),
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text('Qt. ' + listOfQuantities[index].toString(),
-                            style: TextStyle(fontWeight: FontWeight.bold))
-                      ],
-                    ),
-                  ),
-                ),
-              ))),
-    );
+                  Text('Qt. ' + listOfQuantities[index].toString(),
+                      style: TextStyle(fontWeight: FontWeight.bold))
+                ],
+              ),
+            ),
+          ),
+        );
+      }),
+    ));
   }
 
   grandTotal() {
@@ -88,23 +90,45 @@ class _CartScreenState extends State<CartScreen> {
     int grandTotalPrice =
         checkoutTotalPrice == 0 ? 0 : (checkoutTotalPrice + 30);
 
+    List<Map<String, String>> organizingOrder() {
+      List<Map<String, String>> listOfOrganizedOrders = [];
+
+      for (var i = 0; i < listOfOrderedBookNames.length; i++) {
+        listOfOrganizedOrders
+            .add({listOfOrderedBookNames[i]: listOfQuantities[i].toString()});
+      }
+
+      return listOfOrganizedOrders;
+    }
+
     myPayButton() {
       orderPlacing() async {
         final docUser = FirebaseFirestore.instance.collection('orders').doc();
 
         final jsonDoc = OrderStoring(
-            orderedBooks: listOfOrderedBookNames,
-            grandTotal: grandTotalPrice,
-            quantityOfBooks: listOfOrderedBookNames.length);
+          orderedBooks: organizingOrder(),
+          grandTotal: grandTotalPrice,
+        );
 
         try {
           await docUser.set(jsonDoc.toJson());
-          Utilis.showSnackBar('Order stored successfully',
-              color: Theme.of(context).colorScheme.primary);
+          ToastContext().init(context);
+          Future.delayed(
+              Duration(seconds: 10),
+              (() => Toast.show(
+                  'Orders is stored successfully',
+                  duration: 4)));
         } on FirebaseException catch (_) {
           Utilis.showSnackBar('Failed in Placing order. Try again later');
           Navigator.of(context).pop();
         }
+      }
+
+      cartIsEmptyToast() {
+        return Future.delayed(
+            Duration(seconds: 10),
+            (() => Toast.show('You paying but your cart is empty🙄',
+                duration: 4)));
       }
 
       return GooglePayButton(
@@ -116,7 +140,8 @@ class _CartScreenState extends State<CartScreen> {
         onPaymentResult: (resultData) {
           print(resultData);
         },
-        onPressed: (() => orderPlacing()),
+        onPressed: (() =>
+            grandTotalPrice != 0 ? orderPlacing() : cartIsEmptyToast()),
         loadingIndicator: const Center(
           child: CircularProgressIndicator(),
         ),
@@ -126,7 +151,7 @@ class _CartScreenState extends State<CartScreen> {
     ;
 
     return SizedBox(
-      height: 200,
+      height: 230,
       width: double.maxFinite,
       child: Card(
         child: Padding(
@@ -167,9 +192,17 @@ class _CartScreenState extends State<CartScreen> {
                   ),
                 ],
               ),
-              Text(
-                '*Orders will be reach within 3-4 working days.',
-                style: TextStyle(color: Colors.red),
+              Column(
+                children: [
+                  Text(
+                    '*Orders will be reach within 3-4 working days.',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  Text(
+                    " *Don't place new orders with previous cart items remove them first by swiping",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ],
               ),
               Center(
                 child: SizedBox(width: 100, child: myPayButton()),
@@ -183,22 +216,18 @@ class _CartScreenState extends State<CartScreen> {
 }
 
 class OrderStoring {
-  List<dynamic> orderedBooks;
-  int quantityOfBooks;
+  List orderedBooks;
   int grandTotal;
-  String? email = FirebaseAuth.instance.currentUser!.email;
+  String email = FirebaseAuth.instance.currentUser!.email!;
   OrderStoring({
     required this.orderedBooks,
-    required this.quantityOfBooks,
     required this.grandTotal,
-    this.email,
   });
 
   Map<String, dynamic> toJson() => {
         'Orders': orderedBooks,
         'grandtotal': grandTotal,
         'Email': email,
-        'Quantity': quantityOfBooks
       };
 }
 
